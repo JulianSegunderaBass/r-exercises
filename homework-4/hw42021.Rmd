@@ -60,7 +60,6 @@ Use quantile plots and/or QQ plots to compare the two groups after the log trans
 qplot(sample = housing, data = apartments.and.homes, color=home.type) + 
   facet_wrap(~ (housing > 5000) + home.type)
 
-
 ```
 
 ANS: 
@@ -75,6 +74,12 @@ You may want to adjust the size of the points to reduce overplotting.
 
 ```{r fig.width=8, fig.height=6, dpi=100, fig.align='center'}
 # fill in
+library(ggplot2movies)
+
+ggplot(movies, aes(x = year, y = rating)) +
+    geom_line(aes(color = factor(year > 1930))) +
+    stat_summary(fun.data = mean_cl_boot, geom = "point", color = "black")
+
 ```
 
 ANS: 
@@ -86,6 +91,31 @@ Compare the distribution of ratings for each of the genres: action, animation, c
 ```{r fig.width=8, fig.height=6, dpi=100, fig.align='center'}
 
 # fill in
+
+# Re-assigning movies to remove null entries
+movies = na.omit(movies)
+# Repeat function repeats as many as the total rows in movies
+genre = rep(NA, nrow(movies))
+# Getting the sum of the binary row values for each movie across the different genres
+# 18:24 represents the columns for the genres
+# For context, if the sum is greater than 1, the movie is part of multiple genres
+count = rowSums(movies[, 18:24])
+
+# Conditional checking for each record
+# count == 1 means a movie is part of one genre
+genre[which(count == 1 & movies$Action == 1)] = "Action"
+genre[which(count == 1 & movies$Animation == 1)] = "Animation"
+genre[which(count == 1 & movies$Comedy == 1)] = "Comedy"
+genre[which(count == 1 & movies$Drama == 1)] = "Drama"
+genre[which(count == 1 & movies$Documentary == 1)] = "Documentary"
+genre[which(count == 1 & movies$Romance == 1)] = "Romance"
+genre[which(count == 1 & movies$Short == 1)] = "Short"
+movies$genre = as.factor(genre)
+
+ggplot(movies, mapping = aes(x = year, y = rating, color = rating)) + 
+  stat_summary(fun = mean, geom = "line", size = 0.8) +
+  geom_smooth(color = "red") +
+  facet_wrap(~ genre)
 ```
 
 True or False: 
