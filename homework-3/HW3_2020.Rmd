@@ -42,6 +42,7 @@ Note: you may want to use a log transform on the x-axis to see the data more cle
 ```{r fig.width=6, fig.height=4, dpi=80, fig.align='center'}
 # fill in
 
+# Scatterplot function that takes in a per capita column value, a function (in this case population) and a plot title
 per.capita.scatterplot = function(x, n, main.title) {
   CI.data = with(county.data, binom.confint(x = x, n = n, methods = 'exact'))
 
@@ -51,19 +52,28 @@ per.capita.scatterplot = function(x, n, main.title) {
 
   kable( arrange(county.augment, desc(x))[, c("name", "population", "violent.crimes", "per.capita", "lower.CI")], digits=4)
 
-  ggplot(county.augment, aes(x=n, y=per.capita)) + geom_point() + geom_smooth() + ggtitle(main.title) + scale_x_log10()
+  ggplot(county.augment, aes(x=n, y=per.capita)) + geom_point() + geom_smooth() + ggtitle(main.title) +  scale_x_log10()
   
 }
 
+# Violent Crimes by Population
 per.capita.scatterplot(county.data$violent.crimes, county.data$population, "Violent Crimes by Population")
+
+# Births by Population
 per.capita.scatterplot(county.data$births, county.data$population, "Births by Population")
+
+# Deaths by Population
 per.capita.scatterplot(county.data$deaths, county.data$population, "Deaths by Population")
+
+# Infant Deaths by Population
 per.capita.scatterplot(county.data$infant.deaths, county.data$population, "Infant Deaths by Population")
 
 
 ```
 
-ANS: 
+ANS: I'll admit that the results from above don't seem to logically fit each other. Despite seeing an increase in violent crimes with greater populations, we see a decrease in deaths. You'd think more deaths would come up in this case.
+
+Birth data seems a bit more promising in that with higher populations with more births, we see the rate of infant deaths stagnate and level out with a general decrease. This means that while more babies are born in higher populations, infant death rates go down.
 
 **Problem 2:**
 
@@ -89,15 +99,16 @@ Be sure to comment your function thoroughly so that it is easy to understand lat
 ```{r fig.width=8, fig.height=6, dpi=100, fig.align='center'}
 # fill in
 
-find.std.residual = function(data, column, null.prob) {
+find.std.residual = function(data, variable, null.prob) {
   
   null.prob = null.prob / 100
   
-  data = mutate(data, expected.null = column * null.prob,
+  data = mutate(data, expected.null = variable * null.prob,
                 std.dev.null = sqrt(expected.null * (1 - null.prob)),
                 residual = county.data$violent.crimes - expected.null,
                 std.residual = residual / std.dev.null)
   
+  # Decreasing order data by std.residual
   ordered = data[order(-data$std.residual), ]
   return (ordered)
 }
@@ -112,7 +123,10 @@ Use your function from problem 2 to create a table showing the top fifteen count
 ```{r fig.width=8, fig.height=6, dpi=100, fig.align='center'}
 # fill in
 
+# Initial function call
 top.15.crimes = find.std.residual(county.data, county.data$violent.crimes, 1)
+
+# Retrieving only the top 15 records in decreasing crime rate order
 top.15.crimes = top.15.crimes[order(-top.15.crimes$violent.crimes)[1:15], ]
 top.15.crimes
 
@@ -134,6 +148,8 @@ Use this function to create a choropleth plot of the results from problem 3.
 ```{r fig.width=10, fig.height=6, dpi=100, fig.align='center'}
 # fill in
 
+
+# Code taken from Exercise 6 solution
 map.std.residual = function(county.gg, county.data) {
  
   map.rate = with(county.data, sum(violent.crimes) / sum(population))
@@ -151,6 +167,7 @@ map.std.residual = function(county.gg, county.data) {
      
 }
 
+# Calling the mapping function with the top 15 crimes
 map.std.residual(county.gg, top.15.crimes)
 
 ```
@@ -161,12 +178,19 @@ Using the functions you wrote, make a new choropleth plot and table, this time u
 
 ```{r fig.width=10, fig.height=6, dpi=100, fig.align='center'}
 # fill in
-overall.rate = sum(county.data$violent.crimes) / sum(county.data$population)
 
-map.std.residual(county.gg, find.std.residual(county.data, county.data$violent.crimes, overall.rate))
+# Getting the Violent Crime per Capita Rate
+crime.rate = sum(county.data$violent.crimes) / sum(county.data$population)
+
+# Passing the crime rate as the null hypothesis
+map.std.residual(county.gg, find.std.residual(county.data, county.data$violent.crimes, crime.rate))
 
 ```
 
 Comment on why the map and table from problem 5 are different from those of problems 4 and 3.
+
+I think it simply has to do with the number of records in this case. Since the main data set has the full set of counties with their many geo-plotted data points, R is able to constitute a full map view of these locations, but when we limit those records to only 15 (in this case those with the top crime rates), there's less geographical information to make a full map which is why it appears incomplete.
+
+Interestingly, despite the map of the top 15 countries being incomplete, you can still make out how the deeply-colored sections still match with the map of the main data set.
 
 
