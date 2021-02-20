@@ -102,7 +102,6 @@ find.std.residual = function(data, column, null.prob) {
   return (ordered)
 }
 
-find.std.residual(county.data, county.data$population, 1)
 
 ```
 
@@ -162,8 +161,9 @@ Using the functions you wrote, make a new choropleth plot and table, this time u
 
 ```{r fig.width=10, fig.height=6, dpi=100, fig.align='center'}
 # fill in
+overall.rate = sum(county.data$violent.crimes) / sum(county.data$population)
 
-map.std.residual(county.gg, find.std.residual(county.data, county.data$violent.crimes, 20))
+map.std.residual(county.gg, find.std.residual(county.data, county.data$violent.crimes, overall.rate))
 
 ```
 
