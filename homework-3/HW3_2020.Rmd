@@ -105,7 +105,7 @@ find.std.residual = function(data, variable, null.prob) {
   
   data = mutate(data, expected.null = variable * null.prob,
                 std.dev.null = sqrt(expected.null * (1 - null.prob)),
-                residual = county.data$violent.crimes - expected.null,
+                residual = variable - expected.null,
                 std.residual = residual / std.dev.null)
   
   # Decreasing order data by std.residual

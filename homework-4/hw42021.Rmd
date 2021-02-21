@@ -41,12 +41,13 @@ expenditures = read.csv(file = 'dataset_hw4.csv', header = TRUE)
 # Subset for home categories
 apartments.and.homes = subset(expenditures, home.type == "apartment or flat" | home.type == "high-rise" | home.type == "single family detached")
 
+apartments.and.homes$categories = ifelse(apartments.and.homes$home.type == "single family detached", "homes", "apartments")
 
-qplot(sample = housing, data = apartments.and.homes, color=home.type) + facet_wrap(~ home.type)
+qplot(sample = housing, data = apartments.and.homes, color=home.type) + facet_wrap(~ categories)
 
 ```
 
-ANS: 
+ANS: It seems that single, detached families have noticeably higher housing expenditures compared to apartments, flats and high-rises. Detached families also appear to be more consistent along the curve showing a more defined linear relationship whereas apartments, flats and high-rises are more concentrated on lower expenditures with a few higher outliers.
 
 **Problem 2:**
 
@@ -57,12 +58,12 @@ Use quantile plots and/or QQ plots to compare the two groups after the log trans
 ```{r fig.width=8, fig.height=6, dpi=100, fig.align='center'}
 # fill in
 
-qplot(sample = housing, data = apartments.and.homes, color=home.type) + 
-  facet_wrap(~ (housing > 5000) + home.type)
+apartments.and.homes$log.housing = log(apartments.and.homes$housing)
 
+qplot(sample = log.housing, data = apartments.and.homes, color=home.type) + facet_wrap(~ categories)
 ```
 
-ANS: 
+ANS: They both seem to have the same average housing expenditures according to this visualization wherein their midpoints fall around the 8 mark. It bears a similarity with the visualization from Problem 1 wherein apartments, flats and high-rises have more dispersed data with outliers while detached homes show more linear consistency.
 
 ** Problem 3:**
 
@@ -76,9 +77,12 @@ You may want to adjust the size of the points to reduce overplotting.
 # fill in
 library(ggplot2movies)
 
+movies$year.groupings = ifelse(movies$year >= 1930, "1930 and Beyond", "Before 1930")
+
 ggplot(movies, aes(x = year, y = rating)) +
-    geom_line(aes(color = factor(year > 1930))) +
-    stat_summary(fun.data = mean_cl_boot, geom = "point", color = "black")
+    geom_line(aes(color = factor(year >= 1930))) +
+    stat_summary(fun.data = mean_cl_boot, geom = "point", color = "black") +
+    facet_wrap(~ year.groupings, nrow = 2)
 
 ```
 
