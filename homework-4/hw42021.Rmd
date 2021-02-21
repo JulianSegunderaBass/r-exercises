@@ -41,8 +41,11 @@ expenditures = read.csv(file = 'dataset_hw4.csv', header = TRUE)
 # Subset for home categories
 apartments.and.homes = subset(expenditures, home.type == "apartment or flat" | home.type == "high-rise" | home.type == "single family detached")
 
+# if else statement classified single family detached homes into "homes" category
+# Other types of homes (apartments, high-rises and flats) get put into "apartments" category
 apartments.and.homes$categories = ifelse(apartments.and.homes$home.type == "single family detached", "homes", "apartments")
 
+# Plotting housing expenditures data by categories mentioned above, and colored by home type
 qplot(sample = housing, data = apartments.and.homes, color=home.type) + facet_wrap(~ categories)
 
 ```
@@ -58,8 +61,10 @@ Use quantile plots and/or QQ plots to compare the two groups after the log trans
 ```{r fig.width=8, fig.height=6, dpi=100, fig.align='center'}
 # fill in
 
+# log transform for housing expenditures column being stored in "log.housing"
 apartments.and.homes$log.housing = log(apartments.and.homes$housing)
 
+# plotting with log housing expenditures data, grouping by category and coloring by home type
 qplot(sample = log.housing, data = apartments.and.homes, color=home.type) + facet_wrap(~ categories)
 ```
 
@@ -77,16 +82,27 @@ You may want to adjust the size of the points to reduce overplotting.
 # fill in
 library(ggplot2movies)
 
+# if else statement to create two year categories splitting before and after 1930
 movies$year.groupings = ifelse(movies$year >= 1930, "1930 and Beyond", "Before 1930")
 
-ggplot(movies, aes(x = year, y = rating)) +
+# log transform for movie rating column
+movies$log.rating = log(movies$rating)
+
+# plotting log rating data according to year and grouping by year categories
+# geom_line is added to color years according to 1930 split
+# stat_summary adds average ratings point in black for each year
+ggplot(movies, aes(x = year, y = log.rating)) +
     geom_line(aes(color = factor(year >= 1930))) +
     stat_summary(fun.data = mean_cl_boot, geom = "point", color = "black") +
     facet_wrap(~ year.groupings, nrow = 2)
 
 ```
 
-ANS: 
+ANS: In this case, log transform made a huge difference in the visualization especially when it came to my use of geom_line(). With the original data, the line distributions for ratings per year were far too varied and made it difficult to see the true variation among ratings per year.
+
+The variations are still rather strong for years beyond 1930, but are much more manageable. 
+
+Looking at both year groups, it looks like pre-1930's saw slightly higher average ratings with less variation while 1930 and beyond saw slightly lower ratings and more varied data per year. This implies that more recent films after 1930 had far more varied ratings (likely due to more films actually being produced), but still maintained fairly high average ratings (albeit a bit lower than pre-1930's films). The older group of produced films which are implied to be less in number show less varied ratings that are slightly higher on the average.
 
 ** Problem 4:**
 
@@ -116,10 +132,15 @@ genre[which(count == 1 & movies$Romance == 1)] = "Romance"
 genre[which(count == 1 & movies$Short == 1)] = "Short"
 movies$genre = as.factor(genre)
 
+# standard ggplot with stat_summary to allow the use of geom_smooth line
+# grouping graphs according to genre
 ggplot(movies, mapping = aes(x = year, y = rating, color = rating)) + 
   stat_summary(fun = mean, geom = "line", size = 0.8) +
   geom_smooth(color = "red") +
   facet_wrap(~ genre)
+
+# qplot which groups according to genre
+qplot(sample = rating, data = movies, color=genre)
 ```
 
 True or False: 
