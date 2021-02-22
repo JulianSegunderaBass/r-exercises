@@ -52,7 +52,7 @@ per.capita.scatterplot = function(x, n, main.title) {
 
   kable( arrange(county.augment, desc(x))[, c("name", "population", "violent.crimes", "per.capita", "lower.CI")], digits=4)
 
-  ggplot(county.augment, aes(x=n, y=per.capita)) + geom_point() + geom_smooth() + ggtitle(main.title) +  scale_x_log10()
+  ggplot(county.augment, aes(x=n, y=per.capita)) + geom_point() + geom_smooth() + scale_x_log10() + labs(x = "Population", y = "Per Capita", title = main.title)
   
 }
 
@@ -106,8 +106,7 @@ find.std.residual = function(data, variable, null.prob) {
                 residual = variable - expected.null,
                 std.residual = residual / std.dev.null)
   
-  # Decreasing order data by std.residual
-  #ordered = data[order(-data$std.residual), ]
+  # Decreasing data order by std.residual
   return(data.frame(arrange(data, desc(std.residual))))
 }
 
@@ -122,11 +121,9 @@ Use your function from problem 2 to create a table showing the top fifteen count
 # fill in
 
 # Initial function call
+# Retrieving only the top 15 records by violent crime rates
 top.15.crimes = find.std.residual(county.data, county.data$violent.crimes, 0.01)[1:15, ]
 
-# Retrieving only the top 15 records in decreasing crime rate order
-#top.15.crimes = top.15.crimes[order(-top.15.crimes$violent.crimes)[1:15], ]
-kable(top.15.crimes, digits = 4)
 top.15.crimes
 
 ```
@@ -148,21 +145,26 @@ Use this function to create a choropleth plot of the results from problem 3.
 # fill in
 
 
-# Code taken from Exercise 6 solution
+# ----------Code taken from Exercise 6 solution + Help from Zinedine----------
+
 # Creation of the map.std.residual function with 2 parameters which are county.gg, county.data
 map.std.residual = function(county.gg, county.data) {
+  
   # Getting the US.per.capita by dividing the sum of violent.crimes to population
   US.per.capita = sum(county.data$violent.crimes) / sum(county.data$population)
-  # Merging of the 2 data frames by the columns fips and STCOU
+  
+  # Merging the 2 data frames by the columns fips and STCOU
   county.merge = merge(x = county.gg, y = county.data, by.x = "fips", by.y = "STCOU")
-  # Arranging the data frame county.merge according to order number
+  
+  # Arranging the data frame county.merge according to order
   county.merge = arrange(county.merge, order)
-  #starting of data map_data
+  
+  # Starting of data map_data
   county_list = map_data("county")
   
-  # ggplot automatically return value of the map.std.residual function that creates the map
-ggplot() + geom_map(data = county_list, map = county_list, mapping = aes(x = long, y = lat, map_id = region), col = "white", fill = "grey") + geom_polygon(data = county.merge, mapping = aes(x = long, y = lat, group = group, fill = std.residual)) + coord_map() + labs(x = "Longitude", y = "Latitude", fill = "Standard Residual", group = "Counties", title = "Top 15 Counties \n with High Standard Residual") + scale_fill_gradientn(limits = c(0,4000), colours=c("grey", "violet", "blue"), breaks=c(0, 1000 , 2000, 3000, 4000)
-)
+  # ggplot automatically returns value of the map.std.residual function that creates the map
+ggplot() + geom_map(data = county_list, map = county_list, mapping = aes(x = long, y = lat, map_id = region), col = "white", fill = "grey") + geom_polygon(data = county.merge, mapping = aes(x = long, y = lat, group = group, fill = std.residual)) + coord_map() + labs(x = "Longitude", y = "Latitude", fill = "Standard Residual", group = "Counties", title = "Top 15 Counties \n with High Standard Residual") + scale_fill_gradientn(limits = c(0,4000), colours=c("grey", "violet", "blue"), breaks=c(0, 1000 , 2000, 3000, 4000))
+
 }
 
 # Running the function with the appropriate data sets and adding some styles to the created map
@@ -180,17 +182,15 @@ Using the functions you wrote, make a new choropleth plot and table, this time u
 # Getting the Violent Crime per Capita Rate
 crime.rate.per.capita = sum(county.data$violent.crimes) / sum(county.data$population)
 
-#US.crime.per.capita = data.frame(find.std.residual(county.data, county.data$violent.crimes, crime.rate.per.capita))
-
 # Passing the crime rate as the null hypothesis
-map.std.residual(county.gg, find.std.residual(county.data, county.data$violent.crimes,  crime.rate.per.capita)[1:15,])
+map.std.residual(county.gg, find.std.residual(county.data, county.data$violent.crimes, crime.rate.per.capita)[1:15,])
 
 ```
 
 Comment on why the map and table from problem 5 are different from those of problems 4 and 3.
 
-I think it simply has to do with the number of records in this case. Since the main data set has the full set of counties with their many geo-plotted data points, R is able to constitute a full map view of these locations, but when we limit those records to only 15 (in this case those with the top crime rates), there's less geographical information to make a full map which is why it appears incomplete.
+It looks like the shaded regions are the same but with higher standard residual concentrations for the results of problem 5. When you look at the structure of the find.std.residual() function, you see a list of calculations leading up to the standard residual which also depend on the null hypothesis passed in. Since we are passing in a different calculated hypothesis in problem 5, it affects that chain of calculations and adjusts the intensity of the colored results on the map.
 
-Interestingly, despite the map of the top 15 countries being incomplete, you can still make out how the deeply-colored sections still match with the map of the main data set.
+Interestingly enough, it still seems to maintain the same top 15 counties but with varied standard residual results.
 
 

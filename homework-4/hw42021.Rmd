@@ -77,7 +77,7 @@ apartments.and.homes$log.housing = log(apartments.and.homes$housing)
 apartments.and.homes = subset(apartments.and.homes, subset = !is.na(housing) & housing > 0)
 
 # Method 1: plotting with log housing expenditures data, grouping by category and coloring by home type
-qplot(sample = log.housing, data = housing.expenditures.subset, color=home.type) + facet_wrap(~ categories) +
+qplot(sample = log.housing, data = apartments.and.homes, color=home.type) + facet_wrap(~ categories) +
   labs(x="Quantiles", y="Housing Expenditures", title = "Quantile Plot of Household Expenditures by Class", subtitle = "(With Log Transform)")
 
 # Method 2: Plotting with ggplot and stat_qq
