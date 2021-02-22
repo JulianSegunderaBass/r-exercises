@@ -101,16 +101,14 @@ Be sure to comment your function thoroughly so that it is easy to understand lat
 
 find.std.residual = function(data, variable, null.prob) {
   
-  null.prob = null.prob / 100
-  
   data = mutate(data, expected.null = variable * null.prob,
                 std.dev.null = sqrt(expected.null * (1 - null.prob)),
                 residual = variable - expected.null,
                 std.residual = residual / std.dev.null)
   
   # Decreasing order data by std.residual
-  ordered = data[order(-data$std.residual), ]
-  return (ordered)
+  #ordered = data[order(-data$std.residual), ]
+  return(data.frame(arrange(data, desc(std.residual))))
 }
 
 
@@ -124,10 +122,11 @@ Use your function from problem 2 to create a table showing the top fifteen count
 # fill in
 
 # Initial function call
-top.15.crimes = find.std.residual(county.data, county.data$violent.crimes, 1)
+top.15.crimes = find.std.residual(county.data, county.data$violent.crimes, 0.01)[1:15, ]
 
 # Retrieving only the top 15 records in decreasing crime rate order
-top.15.crimes = top.15.crimes[order(-top.15.crimes$violent.crimes)[1:15], ]
+#top.15.crimes = top.15.crimes[order(-top.15.crimes$violent.crimes)[1:15], ]
+kable(top.15.crimes, digits = 4)
 top.15.crimes
 
 ```
@@ -150,25 +149,24 @@ Use this function to create a choropleth plot of the results from problem 3.
 
 
 # Code taken from Exercise 6 solution
+# Creation of the map.std.residual function with 2 parameters which are county.gg, county.data
 map.std.residual = function(county.gg, county.data) {
- 
-  map.rate = with(county.data, sum(violent.crimes) / sum(population))
-
-  county.mapdata = merge(county.gg, county.data, by.x = 'fips', by.y='STCOU')
-
-  county.mapdata = arrange(county.mapdata, order)
-
-  ggplot(data = county.mapdata, mapping = aes(x = long, y = lat, group = group, fill = violent.crimes)) + 
-    geom_polygon() + 
-    coord_map() + 
-    labs(fill = 'Violent Crime Rate', title='Violent Crimes') + 
-    coord_map() +  
-    scale_fill_gradient2(low = 'grey', high = 'red', mid = 'grey', midpoint = map.rate) 
-     
+  # Getting the US.per.capita by dividing the sum of violent.crimes to population
+  US.per.capita = sum(county.data$violent.crimes) / sum(county.data$population)
+  # Merging of the 2 data frames by the columns fips and STCOU
+  county.merge = merge(x = county.gg, y = county.data, by.x = "fips", by.y = "STCOU")
+  # Arranging the data frame county.merge according to order number
+  county.merge = arrange(county.merge, order)
+  #starting of data map_data
+  county_list = map_data("county")
+  
+  # ggplot automatically return value of the map.std.residual function that creates the map
+ggplot() + geom_map(data = county_list, map = county_list, mapping = aes(x = long, y = lat, map_id = region), col = "white", fill = "grey") + geom_polygon(data = county.merge, mapping = aes(x = long, y = lat, group = group, fill = std.residual)) + coord_map() + labs(x = "Longitude", y = "Latitude", fill = "Standard Residual", group = "Counties", title = "Top 15 Counties \n with High Standard Residual") + scale_fill_gradientn(limits = c(0,4000), colours=c("grey", "violet", "blue"), breaks=c(0, 1000 , 2000, 3000, 4000)
+)
 }
 
-# Calling the mapping function with the top 15 crimes
-map.std.residual(county.gg, top.15.crimes)
+# Running the function with the appropriate data sets and adding some styles to the created map
+map.std.residual(county.gg, top.15.crimes) 
 
 ```
 
@@ -180,10 +178,12 @@ Using the functions you wrote, make a new choropleth plot and table, this time u
 # fill in
 
 # Getting the Violent Crime per Capita Rate
-crime.rate = sum(county.data$violent.crimes) / sum(county.data$population)
+crime.rate.per.capita = sum(county.data$violent.crimes) / sum(county.data$population)
+
+#US.crime.per.capita = data.frame(find.std.residual(county.data, county.data$violent.crimes, crime.rate.per.capita))
 
 # Passing the crime rate as the null hypothesis
-map.std.residual(county.gg, find.std.residual(county.data, county.data$violent.crimes, crime.rate))
+map.std.residual(county.gg, find.std.residual(county.data, county.data$violent.crimes,  crime.rate.per.capita)[1:15,])
 
 ```
 
