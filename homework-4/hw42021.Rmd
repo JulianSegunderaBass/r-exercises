@@ -130,6 +130,8 @@ genre[which(count == 1 & movies$Drama == 1)] = "Drama"
 genre[which(count == 1 & movies$Documentary == 1)] = "Documentary"
 genre[which(count == 1 & movies$Romance == 1)] = "Romance"
 genre[which(count == 1 & movies$Short == 1)] = "Short"
+genre[which(count > 1)] = "Multi-Genre"
+
 movies$genre = as.factor(genre)
 
 # standard ggplot with stat_summary to allow the use of geom_smooth line
@@ -140,7 +142,7 @@ ggplot(movies, mapping = aes(x = year, y = rating, color = rating)) +
   facet_wrap(~ genre)
 
 # qplot which groups according to genre
-qplot(sample = rating, data = movies, color=genre)
+qplot(sample = log.rating, data = movies, color=genre)
 ```
 
 True or False: 
@@ -158,6 +160,21 @@ Compare the distribution of ratings for each of the genres, and also for the fol
 
 ```{r fig.width=10, fig.height=10, dpi=100, fig.align='center'}
 # fill in
+
+#movies.1900.1920 = subset(movies, year >= 1900 & year <= 1920)
+#movies.1921.1940 = subset(movies, year >= 1921 & year <= 1940)
+#movies.1941.1960 = subset(movies, year >= 1941 & year <= 1960)
+#movies.1961.1980 = subset(movies, year >= 1961 & year <= 1980)
+#movies.1981.2000 = subset(movies, year >= 1981 & year <= 2000)
+
+#movies = mutate(movies, year.group = )
+
+plotYears = function(data) {
+  qplot(sample = log(rating), data = data, color=genre) + facet_wrap( ~ genre )
+}
+
+plotYears(movies.1900.1920)
+
 ```
 
 * Describe how the distribution of ratings for action movies changed over time, relative to the pooled ratings
