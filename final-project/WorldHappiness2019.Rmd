@@ -1,0 +1,39 @@
+---
+title: World Happiness Report for 2019
+author: Julian Terry S. Bass
+output: html_document
+---
+
+This is an R Notebook File to support further analysis of the World Happiness project.
+
+Importing Libraries
+
+```{r}
+
+library(ggplot2)
+library(plyr)
+library(reshape2)
+library(knitr)
+library(binom) 
+
+```
+
+Loading in the CSV data for 2019
+
+```{r}
+happiness.data = read.csv(file = 'HappinessData2019.csv', header=TRUE)
+```
+
+Comparing Ratio Variables with Overall Scores
+
+```{r}
+# Subset for Ratio Variables and Scores
+scores.ratios = happiness.data[,3:9]
+
+scores.melt = melt(scores.ratios, measure.vars = names(scores.ratios)[2:7])
+
+ggplot(data = scores.melt, mapping=aes(sample=Score)) + stat_qq(dist='qunif') + facet_wrap(~ variable) + stat_qq(data=scores.melt["Score"], mapping=aes(sample=Score), dist='qunif', geom='line') + labs(title = "Test qplot", x='Scores', y='Scores by Ratio Variable')
+
+
+```
+
