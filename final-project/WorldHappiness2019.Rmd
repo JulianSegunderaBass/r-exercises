@@ -27,12 +27,28 @@ happiness.data = read.csv(file = 'HappinessData2019.csv', header=TRUE)
 Comparing Ratio Variables with Overall Scores
 
 ```{r}
+
+# Renaming
+
 # Subset for Ratio Variables and Scores
 scores.ratios = happiness.data[,3:9]
 
 scores.melt = melt(scores.ratios, measure.vars = names(scores.ratios)[2:7])
 
-ggplot(data = scores.melt, mapping=aes(sample=Score)) + stat_qq(dist='qunif') + facet_wrap(~ variable) + stat_qq(data=scores.melt["Score"], mapping=aes(sample=Score), dist='qunif', geom='line') + labs(title = "Test qplot", x='Scores', y='Scores by Ratio Variable')
+#ggplot(data = scores.melt, mapping=aes(sample=Score)) + stat_qq(dist='qunif') + facet_wrap(~ variable) + stat_qq(data=scores.melt["Score"], mapping=aes(sample=Score), dist='qunif', geom='line') + labs(title = "Test qplot", x='Scores', y='Scores by Ratio Variable')
+
+ggplot(scores.melt, aes(x = Score, y = value), las = 2) + 
+  geom_point(aes(color = value > 0.8)) +
+  facet_wrap(~ variable) + 
+  labs(title = "Ratio Values According to Happiness Score", x='Scores', y='Value by Ratio Variable')
+
+
+```
+
+Working with Population, Migrant Count, Urban Population and World Share
+
+```{r}
+
 
 
 ```
