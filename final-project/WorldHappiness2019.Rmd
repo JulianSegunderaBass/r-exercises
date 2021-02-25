@@ -22,6 +22,13 @@ Loading in the CSV data for 2019
 
 ```{r}
 happiness.data = read.csv(file = 'HappinessData2019.csv', header=TRUE)
+
+# Changing some column names
+names(happiness.data)[10] = 'Population.2020'
+names(happiness.data)[11] = 'Population.density'
+names(happiness.data)[12] = 'Migrants.net'
+names(happiness.data)[13] = 'Urban.pop'
+
 ```
 
 Comparing Ratio Variables with Overall Scores
@@ -30,14 +37,13 @@ Comparing Ratio Variables with Overall Scores
 
 # Renaming
 
-# Subset for Ratio Variables and Scores
-scores.ratios = happiness.data[,3:9]
-
-scores.melt = melt(scores.ratios, measure.vars = names(scores.ratios)[2:7])
+# Subset for Ratio Variables and Scores + melting
+scores.ratios = happiness.data[,3:10]
+scores.ratios.melt = melt(scores.ratios, measure.vars = names(scores.ratios)[2:7])
 
 #ggplot(data = scores.melt, mapping=aes(sample=Score)) + stat_qq(dist='qunif') + facet_wrap(~ variable) + stat_qq(data=scores.melt["Score"], mapping=aes(sample=Score), dist='qunif', geom='line') + labs(title = "Test qplot", x='Scores', y='Scores by Ratio Variable')
 
-ggplot(scores.melt, aes(x = Score, y = value), las = 2) + 
+ggplot(scores.ratios.melt, aes(x = Score, y = value), las = 2) + 
   geom_point(aes(color = value > 0.8)) +
   facet_wrap(~ variable) + 
   labs(title = "Ratio Values According to Happiness Score", x='Scores', y='Value by Ratio Variable')
@@ -49,6 +55,22 @@ Working with Population, Migrant Count, Urban Population and World Share
 
 ```{r}
 
+# Subset for Ratio Variables and Scores + melting
+#scores.demographics = subset(happiness.data, 
+                             #select=c('Score', 'Population.2020', 'Population.density', 'Migrants.net', 'Urban.pop', 'World.Share'))
+
+ggplot(scores.ratios.melt, aes(x = log(Population.2020), y = value), las = 2) + 
+  geom_point(aes(color = value > 0.8)) +
+  facet_wrap(~ variable) + 
+  labs(title = "Ratio Values According to Population", x='Population', y='Value by Ratio Variable')
+
+```
+
+Averages for Ratio Variables
+
+```{r}
+
+ddply(scores.ratios.melt, "variable", summarize, avg.ratio = mean(value))
 
 
 ```
