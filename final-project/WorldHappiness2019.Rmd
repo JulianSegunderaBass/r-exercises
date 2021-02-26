@@ -46,10 +46,13 @@ scores.ratios.melt = melt(scores.ratios, measure.vars = names(scores.ratios)[2:7
 ggplot(scores.ratios.melt, aes(x = Score, y = value), las = 2) + 
   geom_point(aes(color = value > 0.8)) +
   facet_wrap(~ variable) + 
-  labs(title = "Ratio Values According to Happiness Score", x='Scores', y='Value by Ratio Variable')
+  labs(title = "Ratio Values According to Happiness Score", x='Scores', y='Value by Ratio Variable') + geom_jitter(position = position_jitter(width = 0.1, height = 0.1), aes(color = value > 0.8), alpha = 0.5)
 
 
 ```
+The ratio values generally land between 0.2 and 1.5, and we can see that using facet_wrap(), GDP per capita, Social Support and a Healthy Life Expectancy are great contributors to the happiness score of a nation. This aligns with the line chart previously shown in Power BI. I've used the midpoint of 0.8 to divide the data into a lower and upper half per variable, and we can see the three mentioned above are the only variables that fit into the upper half.
+
+
 
 Working with Population, Migrant Count, Urban Population and World Share
 
@@ -62,7 +65,7 @@ Working with Population, Migrant Count, Urban Population and World Share
 ggplot(scores.ratios.melt, aes(x = log(Population.2020), y = value), las = 2) + 
   geom_point(aes(color = value > 0.8)) +
   facet_wrap(~ variable) + 
-  labs(title = "Ratio Values According to Population", x='Population', y='Value by Ratio Variable')
+  labs(title = "Ratio Values According to Population", x='Population', y='Value by Ratio Variable') + geom_jitter(position = position_jitter(width = 0.1, height = 0.1), aes(color = value > 0.8), alpha = 0.5)
 
 ```
 
@@ -70,7 +73,17 @@ Averages for Ratio Variables
 
 ```{r}
 
-ddply(scores.ratios.melt, "variable", summarize, avg.ratio = mean(value))
+variable.averages = ddply(scores.ratios.melt, "variable", summarize, avg.ratio = mean(value))
+
+ggplot(variable.averages, aes(x = avg.ratio, y = variable), las = 2) + 
+  geom_point(aes(color = variable))
+
+ggplot(data=scores.ratios.melt, mapping=aes(x = variable, y=value, color=variable)) + 
+  geom_violin() + 
+  geom_point(position=position_jitter(width=.3), size=.6) + 
+  theme(axis.text.x = element_text(angle=45, hjust=1, vjust=1)) + 
+  scale_color_discrete(guide=FALSE) + 
+  labs(x = '', y='Average Scores', title='Ratio Variable Averages')
 
 
 ```
