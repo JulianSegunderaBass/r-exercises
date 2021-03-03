@@ -75,16 +75,33 @@ Averages for Ratio Variables
 
 variable.averages = ddply(scores.ratios.melt, "variable", summarize, avg.ratio = mean(value))
 
-ggplot(variable.averages, aes(x = avg.ratio, y = variable), las = 2) + 
-  geom_point(aes(color = variable))
+#ggplot(variable.averages, aes(x = avg.ratio, y = variable), las = 2) + 
+  #geom_point(aes(color = variable))
 
 ggplot(data=scores.ratios.melt, mapping=aes(x = variable, y=value, color=variable)) + 
   geom_violin() + 
   geom_point(position=position_jitter(width=.3), size=.6) + 
   theme(axis.text.x = element_text(angle=45, hjust=1, vjust=1)) + 
   scale_color_discrete(guide=FALSE) + 
-  labs(x = '', y='Average Scores', title='Ratio Variable Averages')
+  labs(x = 'Variables', y='Values', title='Ratio Variable Values by Melting') +
+  stat_summary(fun.y=median, geom="point", size=2, color="red")
 
+
+```
+Quoting a reference from https://mode.com/blog/violin-plot-examples/,
+
+"Wider sections of the violin plot represent a higher probability that members of the population will take on the given value; the skinnier sections represent a lower probability."
+
+This violin plot once again shows us that a perception of a high GDP, high levels of Social Support and a Healthy Life Expectancy are the ruling contributors to the decision of a happiness score. While initial readings showed GDP to have the highest values, it may very well be that Social Support actually takes the top spot because it has a higher average value and point distribution.
+
+As mentioned in the reference, wider sections of each violin mean that values will likely be more concentrated on that point. GDP has a generally even distribution while Social Support and Life Expectancy are more concentrated on higher scores.
+
+```{r}
+
+scores.demographics = subset(happiness.data, 
+                             select=c('Score', 'Population.2020', 'Population.density', 'Urban.pop'))
+
+scores.demographics.melt = melt(scores.demographics, measure.vars = names(scores.demographics)[2:4])
 
 ```
 
