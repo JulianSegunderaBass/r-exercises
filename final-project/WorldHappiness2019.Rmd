@@ -117,8 +117,12 @@ complete.data$Migrants.net = cut_number(complete.data$Migrants.net, n = 4, label
 # Categories for Urban Population Percentage
 complete.data$Urban.pop = cut_number(complete.data$Urban.pop, n = 4, labels = c('Class 1 - (Low)', 'Class 2 - (Medium)', 'Class 3 - (High)', 'Class 4 - (Very High)'))
 
+# Subset for just the demographic data
 scores.demographics = subset(complete.data, 
                              select=c('Score', 'Population.2020', 'Population.density', 'Migrants.net', 'Urban.pop'))
+
+# Melting into one column
+scores.demographics.melt = melt(scores.demographics, measure.vars = names(scores.demographics)[2:5])
 
 ```
 
