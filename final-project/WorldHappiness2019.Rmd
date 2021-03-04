@@ -15,6 +15,7 @@ library(plyr)
 library(reshape2)
 library(knitr)
 library(binom) 
+library(ggthemes)
 
 ```
 
@@ -117,12 +118,26 @@ complete.data$Migrants.net = cut_number(complete.data$Migrants.net, n = 4, label
 # Categories for Urban Population Percentage
 complete.data$Urban.pop = cut_number(complete.data$Urban.pop, n = 4, labels = c('Class 1 - (Low)', 'Class 2 - (Medium)', 'Class 3 - (High)', 'Class 4 - (Very High)'))
 
+```
+**Plotting from above**
+
+```{r}
+
 # Subset for just the demographic data
 scores.demographics = subset(complete.data, 
                              select=c('Score', 'Population.2020', 'Population.density', 'Migrants.net', 'Urban.pop'))
 
 # Melting into one column
-scores.demographics.melt = melt(scores.demographics, measure.vars = names(scores.demographics)[2:5])
+scores.demographics.melt = melt(scores.demographics, id.vars="Score")
+
+ggplot(scores.demographics.melt, aes(Score, value, color = variable)) + 
+  geom_point(position=position_jitter(width=.3), size=.6) + 
+  stat_smooth() +
+  facet_wrap(~ variable)
+
+ggplot(scores.demographics.melt, aes(Score, variable, color=factor(value)))+
+  geom_point()+ggtitle("This plot looks a lot different from the default")+
+  theme_economist()+scale_colour_economist()
 
 ```
 
