@@ -169,4 +169,14 @@ ggplot(scores.demographics.melt, aes(Score, value, color = value)) +
   labs(title='Demographic Data by Happiness Score')
 
 ```
+This plot takes advantage of running a facet_wrap() based on each demographic attribute and plotting them all together along a range of happiness score values.
 
+I took note of some interesting things here that brought me back to my analysis of the same demographic data in Power BI. I noted there based on some line graphs that population and density didn't have as much of an effect on the score ranges among nations, but there was a noteworthy spike when looking at the Migrant Count values, and we concluded from there that Migrant Count, or in this case "Migrants.net" was a stronger contributor to the decision of happiness scores in a given nation.
+
+This plot seems to follow that same principle because we see that while there is relatively low variation in class values based on population and density, we see clearer breaks in both Migrant Count and Urban Population Percentage. I understand I missed using Urban Population in the Power BI analysis, but that was more so because of data format issues with the percentage which were otherwise solved here in R by the class system.
+
+Looking at Migrants.net, we see that higher-score nations, particularly those with scores between 6.5 and 8 tend to have higher numbers of migrants, and we took note in previous Power BI analytics via the map explorer that the nations with higher scores tended to be more developed. This supports the previous theory that more developed nations with more social support and healthier GDP ranges would lead to a happier outlook on life for immigrants who may be more concentrated in those kinds of nations.
+
+This logically means that migrants in more developed (higher-score) nations may look to GDP, Social Support and a healthier quality of life as stronger indicators of their happiness and/or positivity.
+
+Looking at Urban.pop or Urbanization Percentages, we see that nations with scores from 6 to 8 had higher rates of urbanization which may indicate that more urbanized communities tend to harbor happier individuals. Connecting this with the migrant data, this may also mean more employment opportunities could be a connected improvement for people in urbanized communities which in turn also connects to the strong contribution of GDP to happiness. Lower-score nations tended to have lower rates of urbanization, specifically those with scores below 3.5.
