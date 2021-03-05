@@ -125,19 +125,17 @@ complete.data$Urban.pop = cut_number(complete.data$Urban.pop, n = 4, labels = c(
 
 # Subset for just the demographic data
 scores.demographics = subset(complete.data, 
-                             select=c('Score', 'Population.2020', 'Population.density', 'Migrants.net', 'Urban.pop'))
+                             select=c('Country.or.region', 'Score', 'Population.2020', 'Population.density', 'Migrants.net', 'Urban.pop'))
 
 # Melting into one column
-scores.demographics.melt = melt(scores.demographics, id.vars="Score")
+scores.demographics.melt = melt(scores.demographics, measure.vars = names(scores.demographics)[3:6])
 
-ggplot(scores.demographics.melt, aes(Score, value, color = variable)) + 
+scores.demographics.melt = scores.demographics.melt[ complete.cases(scores.demographics.melt), ]
+
+ggplot(scores.demographics.melt, aes(Score, value, color = value)) + 
   geom_point(position=position_jitter(width=.3), size=.6) + 
   stat_smooth() +
-  facet_wrap(~ variable)
-
-ggplot(scores.demographics.melt, aes(Score, variable, color=factor(value)))+
-  geom_point()+ggtitle("This plot looks a lot different from the default")+
-  theme_economist()+scale_colour_economist()
+  facet_wrap(~ variable, nrow = 4)
 
 ```
 
