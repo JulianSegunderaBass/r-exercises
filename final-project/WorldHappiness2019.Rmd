@@ -119,6 +119,35 @@ complete.data$Migrants.net = cut_number(complete.data$Migrants.net, n = 4, label
 complete.data$Urban.pop = cut_number(complete.data$Urban.pop, n = 4, labels = c('Class 1 - (Low)', 'Class 2 - (Medium)', 'Class 3 - (High)', 'Class 4 - (Very High)'))
 
 ```
+The code above may appear a bit confusing, so we'll break it down into chunks. 
+
+When looking at the original happiness score data, specifically the "demographics" attributes like population, population density, migrant count and degree of urbanization, we can see that the range of values are very far in between. 
+
+For example, the highest rated nation, Finland, has the following demographic attributes:
+
+population: 5540720
+population density: 18
+net migrants: 14000
+urban population: 86%
+
+Because the properties and formats of these data values being so diverse in length, it makes it difficult to plot them on the same graph, so I decided to use the cut_number() function to create a singular range of breaks per attribute. These breaks are:
+
+Class 1 - (Low)
+Class 2 - (Medium)
+Class 3 - (High)
+Class 4 - (Very High)
+
+These classes give a more uniform context to the range of values per attribute. Let's look at the previous record of Finland now with the transformed class values:
+
+population: Class 2 - (Medium)
+population density: Class 1 - (Low)
+net migrants: Class 3 - (High)
+urban population: Class 4 - (Very High)
+
+Personally, I find these much easier to read on a single plot. I did however ask myself if these classes were truly accurate representations of their true numeric values in the original data, that is, does a "Medium" population class really match with the original value of 5540720 for Finland? The answer is yes, they do. I dug through both versions of the data set and compared some records among different nations, and I found that the class representations really did follow through with the original values. Nations with a population class of very high indeed showed values much higher than other nations, and nations with a mid-range or "Medium" migrant count really did have migrant count values generally in the mid-range compared to others.
+
+This means that I have successfully created a uniform classification system that makes the otherwise diverse value range of demographic attributes more readable on a single plot. The plot below shows these classes in action according to the happiness score.
+
 **Plotting from above**
 
 ```{r}
@@ -135,7 +164,9 @@ scores.demographics.melt = scores.demographics.melt[ complete.cases(scores.demog
 ggplot(scores.demographics.melt, aes(Score, value, color = value)) + 
   geom_point(position=position_jitter(width=.3), size=.6) + 
   stat_smooth() +
-  facet_wrap(~ variable, nrow = 4)
+  scale_x_continuous(breaks = c(2, 3, 4, 5, 6, 7, 8)) +
+  facet_wrap(~ variable, nrow = 4) +
+  labs(title='Demographic Data by Happiness Score')
 
 ```
 
